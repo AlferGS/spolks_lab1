@@ -1,0 +1,14 @@
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe.config
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.pdb
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csprojAssemblyReference.cache
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.CoreCompileInputs.cache
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.exe
+G:\Programs\Project C#\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.pdb
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe.config
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.pdb
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.AssemblyReference.cache
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.CoreCompileInputs.cache
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.exe
+D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.pdb

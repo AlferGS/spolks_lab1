@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "spolks_lab1_Server/1.0.0": {
+        "runtime": {
+          "spolks_lab1_Server.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "spolks_lab1_Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
