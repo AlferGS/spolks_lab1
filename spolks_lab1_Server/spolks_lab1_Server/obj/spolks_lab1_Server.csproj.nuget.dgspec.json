@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects C#\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj": {}
+    "D:\\Projects C#\\spolks_lab1\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj": {}
   },
   "projects": {
-    "D:\\Projects C#\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj": {
+    "D:\\Projects C#\\spolks_lab1\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects C#\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj",
+        "projectUniqueName": "D:\\Projects C#\\spolks_lab1\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj",
         "projectName": "spolks_lab1_Server",
-        "projectPath": "D:\\Projects C#\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj",
+        "projectPath": "D:\\Projects C#\\spolks_lab1\\spolks_lab1_Server\\spolks_lab1_Server\\spolks_lab1_Server.csproj",
         "packagesPath": "C:\\Users\\barab\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects C#\\spolks_lab1_Server\\spolks_lab1_Server\\obj\\",
+        "outputPath": "D:\\Projects C#\\spolks_lab1\\spolks_lab1_Server\\spolks_lab1_Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

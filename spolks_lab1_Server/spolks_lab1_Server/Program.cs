@@ -1,124 +1,11 @@
-﻿//using System;
-//using System.IO;
-//using System.Text;
-//using System.Net;
-//using System.Net.Sockets;
-//using System.Threading.Tasks;
-//using System.Threading;
-
-////for (int i = 0; i < 100; i++)
-////{
-////    //Console.Clear();
-////    Console.SetCursorPosition(0, 0);
-////    Console.WriteLine(i);
-////    Thread.Sleep(100);
-////}
-
-//namespace SocketTcpServer
-//{
-//    class Program
-//    {
-//        static void Main(string[] args)
-//        {
-//            int port = 8888;
-//            //IPAddress serverIP = IPAddress.Parse("127.0.0.1");
-//            IPAddress serverIP = IPAddress.Parse("192.168.0.109");
-//            string filename = "text2.TXT";
-//            int sizOfBlock = 512;
-
-//            Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-//            try
-//            {
-//                serverSocket.Bind(new IPEndPoint(serverIP, port));
-//                serverSocket.Listen(10);
-//                Console.WriteLine($"Start Server. Wait new connections...");
-
-//                while (true)
-//                {
-
-//                    Socket handler = serverSocket.Accept(); // getting connections to serverSocket
-//                    StringBuilder builder = new StringBuilder();
-//                    int length = 0;
-//                    byte[] data = new byte[sizOfBlock]; //buffer for message 
-//                    //receive message from client
-//                    do
-//                    {
-//                        length = handler.Receive(data);
-//                        builder.Append(Encoding.Unicode.GetString(data, 0, length));
-//                    } while (handler.Available > 0);
-
-//                    Console.WriteLine($"{DateTime.Now.ToString()}: {builder.ToString()}");
-
-//                    //send length of file to client
-//                    var file = File.OpenRead(filename);
-//                    var fileLength = file.Length;
-//                    data = Encoding.Unicode.GetBytes(file.Length.ToString());
-//                    int i = handler.Send(data);
-//                    file.Close();
-//                    Console.WriteLine($"{DateTime.Now.ToString()}: file length = {fileLength}");
-//                    Console.WriteLine($"{DateTime.Now.ToString()}: i = {i}");
-
-//                    //receive confirm from client
-//                    do
-//                    {
-//                        length = handler.Receive(data);
-//                        builder.Append(Encoding.Unicode.GetString(data, 0, length));
-//                    } while (handler.Available > 0);
-//                    Console.WriteLine($"{DateTime.Now.ToString()}: {builder.ToString()}");
-
-//                    //send file
-//                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite))
-//                    {
-//                        byte[] fileData = new byte[fileLength];
-//                        stream.Read(fileData, 0, Convert.ToInt32(fileLength));
-//                        int offset = 0;
-//                        int remnant = Convert.ToInt32(fileLength) % sizOfBlock;
-
-//                        do
-//                        {
-//                            byte[] buff = new byte[sizOfBlock];
-//                            buff = BufToBuf(fileData, buff, offset, sizOfBlock);
-//                            handler.Send(buff);
-//                            offset += sizOfBlock;
-//                            if (offset == Convert.ToInt32(fileLength) - remnant)
-//                            {
-//                                sizOfBlock = remnant;
-//                            }
-//                        } while (offset < fileLength);
-//                    }
-//                    handler.Shutdown(SocketShutdown.Both);
-//                    handler.Close();
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                Console.WriteLine(ex.Message);
-//            }
-//            Console.ReadKey();
-//        }
-
-//        static byte[] BufToBuf(byte[] sourceArray, byte[] resultArray, int offset, int count)
-//        {
-//            for(int i = 0; i < count; i++)
-//            {
-//                resultArray[i] = sourceArray[i + offset];
-//            }
-//            return resultArray;
-//        }
-//    }
-//}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpooksServerV2
@@ -127,16 +14,25 @@ namespace SpooksServerV2
     {
         const int PORT_NO = 8001;
         const string SERVER_IP = "127.0.0.1";
-        //static string filename = "text2.TXT";
+        static string filename;
         static Socket serverSocket;
         static bool QUIT = false;
-        private const int BUFFER_SIZE = 8192;
-        private static byte[] buffer = new byte[BUFFER_SIZE];
         static bool ECHO = false;
         static bool UPLOAD = false;
         static bool DOWNLOAD = false;
+        private const int BUFFER_SIZE = 8192;
+        private static byte[] buffer = new byte[BUFFER_SIZE];
         const int MAX_RECEIVE_ATTEMPT = 10;
         static int receiveAttempt = 0;
+
+        static byte[] BufToBuf(byte[] sourceArray, byte[] resultArray, int offset, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                resultArray[i] = sourceArray[i + offset];
+            }
+            return resultArray;
+        }
 
         static void Main(string[] args)
         {
@@ -173,9 +69,9 @@ namespace SpooksServerV2
         {
             Console.WriteLine("UPLOADMODE");
             int length;
-            long fileLength;
-   
             string lenghtStr = "";
+            int fileLength;
+   
             do
             {
                 length = socket.Receive(data);
@@ -185,10 +81,15 @@ namespace SpooksServerV2
             fileLength = Convert.ToInt32(lenghtStr);
 
             Console.WriteLine("LENGTH IS " + fileLength);
+ /*add*/    socket.Send(Encoding.ASCII.GetBytes("Server is ready to receive file " + DateTime.Now));
             using (FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite))
             {
                 int offset = 0;
-                int block = BUFFER_SIZE;
+                int block;
+                if (fileLength > BUFFER_SIZE)
+                    block = BUFFER_SIZE;
+                else
+                    block = fileLength;
                 int remnant = Convert.ToInt32(fileLength) % BUFFER_SIZE;
                 do
                 {
@@ -214,43 +115,63 @@ namespace SpooksServerV2
             Console.WriteLine("DOWNLOADMODE");
             if (!File.Exists(filename)) { 
                 Console.WriteLine("FILE DOESN'T EXIST");
-                socket.Send(Encoding.UTF8.GetBytes("FILE DOESN'T EXIST"));
+                socket.Send(Encoding.Unicode.GetBytes("FILE DOESN'T EXIST"));
                 return false;
             }
             try
             {
                 byte[] data;
+   // /*add*/     socket.Send(Encoding.UTF8.GetBytes("SENDING " + DateTime.Now));
                 var file = File.OpenRead(filename);
-                var fileLength = file.Length;
-                // string message = "";
+                int fileLength = Convert.ToInt32(file.Length);
                 
                 // send file length
                 Console.WriteLine("LENGTH IS " + fileLength);
-                data = Encoding.Unicode.GetBytes(fileLength.ToString());
+                data = Encoding.ASCII.GetBytes(fileLength.ToString());
                 socket.Send(data);
-                file.Close();  
-                
+                file.Close();
+                Console.WriteLine("Start sending file to client");
+                string lengthStr = "";
+                int length = 0;
+                do
+                {
+                    length = socket.Receive(data);
+                    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                } while (socket.Available > 0);
+                Console.WriteLine(lengthStr);
+
                 // send file to client
-                //using (FileStream stream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                //{
-                //    // read file data in fileData buffer
-                //    int block = BUFFER_SIZE;
-                //    byte[] fileData = new byte[fileLength];
-                //    stream.Read(fileData, 0, Convert.ToInt32(fileLength));
-                //    int offset = 0;
-                //    int remnant = Convert.ToInt32(fileLength) % BUFFER_SIZE;
-                //    do
-                //    {
-                //        data = new byte[block];
-                //        data = BufToBuf(fileData, data, offset, block);
-                //        socket.Send(data);
-                //        offset += block;
-                //        if (offset == Convert.ToInt32(fileLength) - remnant)    //if EOF
-                //        {
-                //            block = remnant;
-                //        }
-                //    } while (offset < fileLength);
-                //}
+                using (FileStream stream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    // read file data in fileData buffer
+                    int block;
+                    if (fileLength > BUFFER_SIZE)
+                        block = BUFFER_SIZE;
+                    else
+                        block = fileLength;
+                    byte[] fileData = new byte[fileLength];
+                    stream.Read(fileData, 0, Convert.ToInt32(fileLength));
+                    int offset = 0;
+                    int remnant = Convert.ToInt32(fileLength) % BUFFER_SIZE;
+                    do
+                    {
+                        data = new byte[block];
+                        data = BufToBuf(fileData, data, offset, block);
+                        socket.Send(data);
+                        offset += block;
+                        if (offset == Convert.ToInt32(fileLength) - remnant)    //if EOF
+                        {
+                            block = remnant;
+                        }
+                    } while (offset < fileLength);
+                }
+
+                do
+                {
+                    length = socket.Receive(data);
+                    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                } while (socket.Available > 0);
+                Console.WriteLine(lengthStr);
             }
             catch (Exception ex)
             {
@@ -258,15 +179,6 @@ namespace SpooksServerV2
                 return false;
             }
             return true;
-        }
-
-        static byte[] BufToBuf(byte[] sourceArray, byte[] resultArray, int offset, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                resultArray[i] = sourceArray[i + offset];
-            }
-            return resultArray;
         }
 
         private static void ReceiveCallback(IAsyncResult result)
@@ -277,8 +189,6 @@ namespace SpooksServerV2
                 socket = (Socket)result.AsyncState;
                 if (socket.Connected)
                 {
-                    //int length = 0;
-                    //long fileLength = 0;
                     byte[] data;
                     int received = socket.EndReceive(result);
                     if (received > 0)
@@ -287,9 +197,10 @@ namespace SpooksServerV2
                         Buffer.BlockCopy(buffer, 0, data, 0, data.Length);
                         string receivedMsg = Encoding.UTF8.GetString(data);
                         string switchMsg;
+                        //  Check that receiveMsg got ' '
                         if (receivedMsg.IndexOf(' ') == -1)
                             switchMsg = receivedMsg;
-                        else
+                        else  // if it have ' ', get substring with first word (command word) 
                             switchMsg = receivedMsg.Substring(0, receivedMsg.IndexOf(' '));
 
                         if (ECHO)
@@ -314,17 +225,17 @@ namespace SpooksServerV2
                                     QUIT = true;
                                 }
                                 break;
-                            case "UPLOAD":
+                            case "UPLOAD":  // FILESEND
                                 {
-                                    string filename = receivedMsg.Substring(receivedMsg.IndexOf(' ') + 1,
+                                    filename = receivedMsg.Substring(receivedMsg.IndexOf(' ') + 1,
                                                        receivedMsg.Length - receivedMsg.IndexOf(' ') - 1);
                                     Console.WriteLine(filename);
                                     UploadFileToServer(socket, data, filename);
                                 }
                                 break;
-                            case "DOWNLOAD":
+                            case "DOWNLOAD": // FILERECEIVE
                                 {
-                                    string filename = receivedMsg.Substring(receivedMsg.IndexOf(' ') + 1,
+                                    filename = receivedMsg.Substring(receivedMsg.IndexOf(' ') + 1,
                                                        receivedMsg.Length - receivedMsg.IndexOf(' ') - 1);
                                     Console.WriteLine(filename);
                                     DownloadFileFromServer(socket, filename);
@@ -332,7 +243,7 @@ namespace SpooksServerV2
                                 break;
                             default:
                                 {
-                                    if (UPLOAD || DOWNLOAD)
+                                    if (UPLOAD || DOWNLOAD) // maybe comment this if
                                         break;
                                     Console.WriteLine(receivedMsg);
                                     string msg = "received at " + DateTime.Now;

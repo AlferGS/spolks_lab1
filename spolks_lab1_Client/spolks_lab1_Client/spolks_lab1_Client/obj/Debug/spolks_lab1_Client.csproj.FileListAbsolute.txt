@@ -12,3 +12,10 @@ D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debu
 D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.CoreCompileInputs.cache
 D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.exe
 D:\Projects C#\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.pdb
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe.config
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.exe
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\bin\Debug\spolks_lab1_Client.pdb
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.AssemblyReference.cache
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.csproj.CoreCompileInputs.cache
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.exe
+D:\Projects C#\spolks_lab1\spolks_lab1_Client\spolks_lab1_Client\spolks_lab1_Client\obj\Debug\spolks_lab1_Client.pdb

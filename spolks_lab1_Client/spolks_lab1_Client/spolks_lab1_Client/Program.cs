@@ -40,7 +40,8 @@ namespace SpooksClientV2
             {
                 if (!UPLOAD && !DOWNLOAD)
                     result = Console.ReadLine();
-                
+                else
+                    result = "";
                 byte[] bytes = Encoding.ASCII.GetBytes(result);
                 try
                 {
@@ -84,13 +85,13 @@ namespace SpooksClientV2
             } while (result.ToLower().Trim() != "QUIT");
         }
 
-        static bool UploadFileToServer()
+        static bool UploadFileToServer()    // FILESEND
         {
             try
             {
                 byte[] data = new byte[BUFFER_SIZE];
                 var file = File.OpenRead(filename);
-                var fileLength = file.Length;
+                int fileLength = Convert.ToInt32(file.Length);
                 data = Encoding.Unicode.GetBytes(file.Length.ToString());
                 clientSocket.Send(data);
                 file.Close();
@@ -98,7 +99,11 @@ namespace SpooksClientV2
                 
                 using (FileStream stream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
-                    int block = BUFFER_SIZE;
+                    int block;
+                    if (fileLength > BUFFER_SIZE)
+                        block = BUFFER_SIZE;
+                    else
+                        block = fileLength;
                     byte[] fileData = new byte[fileLength];
                     stream.Read(fileData, 0, Convert.ToInt32(fileLength));
                     int offset = 0;
@@ -126,51 +131,65 @@ namespace SpooksClientV2
             return true;
         }
 
-        static bool DownloadFileFromServer(Socket clientSocket)
+        static bool DownloadFileFromServer(Socket clientSocket) //FILERECEIVE
         {
-            Socket socket = null;
-            //socket = (Socket)result.AsyncState;
             try
             {
                 int length = 0;
-                long fileLength = 0;
-                string lenghtStr = "";
+                int fileLength = 0;
+                string lengthStr = "";
                 byte[] data = new byte[BUFFER_SIZE];
                 
-                // get fileLength in client
+                // get confirm that that file exist on server
                 do
                 {
-                    length = socket.Receive(data);
-                    lenghtStr += Encoding.UTF8.GetString(data, 0, length);
-                } while (socket.Available > 0);
-                Console.WriteLine(lenghtStr + " sadfhj");
-                if (lenghtStr.Equals("FILE DOESN'T EXIST"))
+                    length = clientSocket.Receive(data);
+                    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                } while (clientSocket.Available > 0);
+                Console.WriteLine(lengthStr);
+                if (lengthStr.Equals("FILE DOESN'T EXIST"))
                 {
                     DOWNLOAD = false;
                     return false;
                 }
-                fileLength = Convert.ToInt32(lenghtStr);
+                Console.WriteLine("File exist");
+
+                // get fileLength in client
+                //do
+                //{
+                //    length = clientSocket.Receive(data);
+                //    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                //} while (clientSocket.Available > 0);
+                //Console.WriteLine(lengthStr);
+                fileLength = Convert.ToInt32(lengthStr);
                 Console.WriteLine("LENGTH IS " + fileLength);
+                Console.WriteLine("Start receiving file from server");
+                clientSocket.Send(Encoding.ASCII.GetBytes("Client is ready to receive file " + DateTime.Now));
 
                 // receive file in client
-                //using (FileStream stream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite))
-                //{
-                //    int offset = 0;
-                //    int block = BUFFER_SIZE;
-                //    int remnant = Convert.ToInt32(fileLength) % BUFFER_SIZE;
-                //    do
-                //    {
-                //        data = new byte[block];
-                //        socket.Receive(data, block, 0);
-                //        stream.Write(data, 0, block);
-                //        offset += block;
-                //        if (offset == Convert.ToInt32(fileLength) - remnant)    //if EOF
-                //        {
-                //            block = remnant;
-                //        }
-                //    } while (offset < fileLength);
-                //}
+                using (FileStream stream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    int offset = 0;
+                    int block;
+                    if (fileLength > BUFFER_SIZE)
+                        block = BUFFER_SIZE;
+                    else
+                        block = fileLength;
+                    int remnant = Convert.ToInt32(fileLength) % BUFFER_SIZE;
+                    do
+                    {
+                        data = new byte[block];
+                        clientSocket.Receive(data, block, 0);
+                        stream.Write(data, 0, block);
+                        offset += block;
+                        if (offset == Convert.ToInt32(fileLength) - remnant)    //if EOF
+                        {
+                            block = remnant;
+                        }
+                    } while (offset < fileLength);
+                }
                 string msg = "finished " + DateTime.Now;
+                clientSocket.Send(Encoding.Unicode.GetBytes(msg));
                 Console.WriteLine(msg);
                 DOWNLOAD = false;
             }
@@ -232,12 +251,12 @@ namespace SpooksClientV2
             try
             {
                 socket = (Socket)result.AsyncState;
-                if (socket.Connected)
+                if (socket.Connected && !DOWNLOAD)
                 {
                     int received = socket.EndReceive(result);
                     byte[] data;
 
-                    if (received > 0)
+                    if (received > 0 && !DOWNLOAD)
                     {
                         receiveAttempt = 0;
                         data = new byte[received];
