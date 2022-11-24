@@ -15,6 +15,7 @@ namespace SpooksClientV2
         const string SERVER_IP = "127.0.0.1";
         static string filename;
         static Socket clientSocket;
+        static Socket socket;
         static int BUFFER_SIZE = 8192;
         static bool UPLOAD = false;
         static bool DOWNLOAD = false;
@@ -78,7 +79,7 @@ namespace SpooksClientV2
                 }
                 if(DOWNLOAD)
                 {
-                    if (DownloadFileFromServer(clientSocket) == false)
+                    if (DownloadFileFromServer(/*clientSocket*/) == false)
                         Console.WriteLine("Error with download");
                     DOWNLOAD = false;
                 }
@@ -131,7 +132,7 @@ namespace SpooksClientV2
             return true;
         }
 
-        static bool DownloadFileFromServer(Socket clientSocket) //FILERECEIVE
+        static bool DownloadFileFromServer(/*Socket clientSocket*/) //FILERECEIVE
         {
             try
             {
@@ -139,12 +140,12 @@ namespace SpooksClientV2
                 int fileLength = 0;
                 string lengthStr = "";
                 byte[] data = new byte[BUFFER_SIZE];
-                
+
                 // get confirm that that file exist on server
-                do
+                do//while (clientSocket.Available > 0)
                 {
                     length = clientSocket.Receive(data);
-                    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                    lengthStr += Encoding.UTF8.GetString(data, 0, length);
                 } while (clientSocket.Available > 0);
                 Console.WriteLine(lengthStr);
                 if (lengthStr.Equals("FILE DOESN'T EXIST"))
@@ -179,7 +180,7 @@ namespace SpooksClientV2
                     do
                     {
                         data = new byte[block];
-                        clientSocket.Receive(data, block, 0);
+                        socket.Receive(data, block, 0);
                         stream.Write(data, 0, block);
                         offset += block;
                         if (offset == Convert.ToInt32(fileLength) - remnant)    //if EOF
@@ -192,12 +193,14 @@ namespace SpooksClientV2
                 clientSocket.Send(Encoding.Unicode.GetBytes(msg));
                 Console.WriteLine(msg);
                 DOWNLOAD = false;
+                //clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), clientSocket);
             }
             catch (Exception ex) 
             {
                 Console.WriteLine(ex.Message);
                 return false;
             }
+            clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), clientSocket);
             return true;
         }
 
@@ -247,7 +250,7 @@ namespace SpooksClientV2
 
         private static void ReceiveCallback(IAsyncResult result)
         {
-            Socket socket = null;
+            socket = null;
             try
             {
                 socket = (Socket)result.AsyncState;

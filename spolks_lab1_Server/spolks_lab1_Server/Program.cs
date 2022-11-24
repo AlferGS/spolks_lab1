@@ -16,6 +16,7 @@ namespace SpooksServerV2
         const string SERVER_IP = "127.0.0.1";
         static string filename;
         static Socket serverSocket;
+        static Socket socket;
         static bool QUIT = false;
         static bool ECHO = false;
         static bool UPLOAD = false;
@@ -120,6 +121,7 @@ namespace SpooksServerV2
             }
             try
             {
+                socket.Send(Encoding.UTF8.GetBytes("sdafghjkl"));
                 byte[] data;
    // /*add*/     socket.Send(Encoding.UTF8.GetBytes("SENDING " + DateTime.Now));
                 var file = File.OpenRead(filename);
@@ -130,15 +132,16 @@ namespace SpooksServerV2
                 data = Encoding.ASCII.GetBytes(fileLength.ToString());
                 socket.Send(data);
                 file.Close();
-                Console.WriteLine("Start sending file to client");
+
                 string lengthStr = "";
                 int length = 0;
                 do
                 {
                     length = socket.Receive(data);
-                    lengthStr += Encoding.Unicode.GetString(data, 0, length);
+                    lengthStr += Encoding.ASCII.GetString(data, 0, length);
                 } while (socket.Available > 0);
                 Console.WriteLine(lengthStr);
+                Console.WriteLine("Start sending file to client");
 
                 // send file to client
                 using (FileStream stream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
@@ -171,7 +174,7 @@ namespace SpooksServerV2
                     length = socket.Receive(data);
                     lengthStr += Encoding.Unicode.GetString(data, 0, length);
                 } while (socket.Available > 0);
-                Console.WriteLine(lengthStr);
+                //Console.WriteLine(lengthStr);
             }
             catch (Exception ex)
             {
@@ -183,7 +186,7 @@ namespace SpooksServerV2
 
         private static void ReceiveCallback(IAsyncResult result)
         {
-            Socket socket = null;
+            socket = null;
             try
             {
                 socket = (Socket)result.AsyncState;
