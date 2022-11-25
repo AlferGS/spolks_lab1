@@ -219,7 +219,7 @@ namespace SpooksServerV2
                                     ECHO = true;
                                 break;
                             case "TIME":
-                                {
+                                { 
                                     socket.Send(Encoding.ASCII.GetBytes("" + DateTime.Now));
                                 }
                                 break;

@@ -204,6 +204,16 @@ namespace SpooksClientV2
             return true;
         }
 
+        static bool CheckFileExists(string filename)
+        {
+            if (!File.Exists(filename) && UPLOAD)
+            {
+                Console.WriteLine("file doesn't exist");
+                return false;
+            }
+            return true;
+        }
+
         static void LoopConnect(int noOfRetry, int attemptPeriodInSeconds)
         {
             int attempts = 0;
